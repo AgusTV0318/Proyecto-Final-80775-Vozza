@@ -90,7 +90,7 @@ async function fetchLatestFromAPI(base = API_BASE_CURRENCY) {
     const res = await fetch(url);
 
     if (!res.ok) {
-      throw new Error(`Error HTTPS: ${res.status}`);
+      throw new Error(`Error HTTP: ${res.status}`);
     }
 
     const data = await res.json();
@@ -112,30 +112,6 @@ async function fetchLatestFromAPI(base = API_BASE_CURRENCY) {
     };
   } catch (error) {
     console.error("Error en fetchLatestFromAPI:", error);
-    throw error;
-  }
-}
-
-async function fetchLatest() {
-  const API_BASE =
-    "https://api.exchangerate.host/latest?base=ARS&symbols=USD,EUR,BRL";
-
-  try {
-    const res = await fetch(API_BASE);
-
-    if (!res.ok) {
-      throw new Error(`Error HTTP: ${Response.status}`);
-    }
-
-    const data = await res.json();
-
-    if (!data.rates) {
-      throw new Error("Respuesta de API inválida o incompleta.");
-    }
-
-    return data;
-  } catch (error) {
-    console.error("Error al obtener datos de la API:", error);
     throw error;
   }
 }
@@ -179,9 +155,7 @@ async function fetchTimeseriesFromAPI(base, target, days) {
 
 async function fetchLatestFromLocal() {
   try {
-    const res = await fetch(
-      "https://api.exchangerate.host/latest?base=ARS&symbols=USD"
-    );
+    const res = await fetch(LOCAL_DATA_URL);
     if (!res.ok) throw new Error("No se pudo cargar JSON local");
     const data = await res.json();
     const map = { ...data.rates };
@@ -414,7 +388,9 @@ async function loadRates() {
   limpiarError();
 
   try {
-    const { rates: map, updatedAt: date } = await fetchLatestFromAPI(API_BASE);
+    const { rates: map, updatedAt: date } = await fetchLatestFromAPI(
+      API_BASE_CURRENCY
+    );
     rates = map;
     if (updatedAt) {
       updatedAt.textContent = new Date(date).toLocaleString();
