@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Convertidor de Monedas - Simulador</title>
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
+    <link rel="stylesheet" href="./style.css" />
+
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/toastify-js" defer></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/dayjs@1/dayjs.min.js"
+      defer
+    ></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"
+      defer
+    ></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+  </head>
+
+  <body data-json="./currencies.json">
+    <noscript>Este convertidor requiere JavaScript Habilitado.</noscript>
+
+    <header class="header">
+      <div class="brand">
+        <span class="logo" aria-hidden="true">💱</span>
+        <div>
+          <h1>Convertidor de Monedas</h1>
+          <p class="subtitle">Rápido, claro y pensado para ARS como base</p>
+        </div>
+      </div>
+
+      <nav class="header-actions">
+        <button
+          id="btn-open-settings"
+          class="btn btn-ghost"
+          aria-haspopup="dialog"
+          aria-controls="settings-modal"
+          aria-label="Abrir configuración"
+        >
+          ⚙️
+        </button>
+        <button
+          id="btn-open-favorites"
+          class="btn btn-ghost"
+          aria-expanded="false"
+          aria-controls="favorites-panel"
+        >
+          ⭐
+        </button>
+      </nav>
+    </header>
+
+    <main class="container">
+      <section id="banner" class="banner">
+        <div
+          id="offline-banner"
+          class="banner-item hidden"
+          role="status"
+          aria-live="polite"
+        >
+          Estás sin conexión a internet
+        </div>
+        <div id="demo-banner" class="banner-item info hidden" role="status">
+          Datos cargados desde JSON simulado.
+        </div>
+      </section>
+
+      <section class="card" id="converter">
+        <h2>Conversión</h2>
+
+        <form id="converter-form" class="converter-form" autocomplete="off">
+          <div class="field-group">
+            <label for="amount"><span>Monto</span></label>
+            <div class="amount-row">
+              <input
+                id="amount"
+                name="amount"
+                type="number"
+                step="0.01"
+                min="0"
+                inputmode="decimal"
+                placeholder="10000"
+                required
+              />
+              <button
+                id="btn-quick-max"
+                type="button"
+                class="btn btn-ghost"
+                title="Usar monto máximo"
+              >
+                MAX
+              </button>
+              <button
+                id="btn-clear-amount"
+                type="button"
+                class="btn btn-ghost"
+                title="limpiar"
+              >
+                ✕
+              </button>
+            </div>
+          </div>
+
+          <div class="field-group two-col">
+            <div>
+              <label for="base"><span>Desde</span></label>
+              <select
+                id="base"
+                name="base"
+                required
+                aria-label="Moneda base"
+              ></select>
+            </div>
+
+            <div class="swap-wrap">
+              <button
+                id="btn-swap"
+                type="button"
+                class="btn btn-secondary"
+                title="Invertir Monedas"
+                aria-label="Invertir Monedas"
+              >
+                ⇄
+              </button>
+            </div>
+
+            <div>
+              <label for="target"><span>Hacia</span></label>
+              <select
+                id="target"
+                name="target"
+                required
+                aria-label="Moneda Destino"
+              ></select>
+            </div>
+          </div>
+
+          <div class="field-group">
+            <div class="options-row">
+              <label class="inline">
+                <input id="include-fees" type="checkbox" />
+                <span>Incluir margen/costo</span>
+              </label>
+
+              <label class="inline">
+                <span>Redondeo</span>
+                <select id="rounding-mode">
+                  <option value="none">Sin Redondeo</option>
+                  <option value="2">2 Decimales</option>
+                  <option value="4">4 Decimales</option>
+                </select>
+              </label>
+
+              <div class="inline" id="fee-wrap" aria-live="polite">
+                <label for="fee-margin"><span>Margen</span></label>
+                <input
+                  id="fee-margin"
+                  type="range"
+                  min="0"
+                  max="10"
+                  step="0.25"
+                  value="2"
+                />
+                <output id="fee-output">2%</output>
+              </div>
+            </div>
+          </div>
+
+          <div class="actions">
+            <button id="btn-convert" type="submit" class="btn btn-primary">
+              Convertir
+            </button>
+            <button
+              id="btn-reverse"
+              type="button"
+              class="btn btn-secondary"
+              title="Usar monto resultante como base"
+            >
+              Reverso
+            </button>
+            <button
+              id="btn-add-favorite"
+              type="button"
+              class="btn btn-ghost"
+              title="Guardar par como favorito"
+            >
+              ⭐ Favorito
+            </button>
+          </div>
+        </form>
+
+        <section>
+          <h3>Conversión múltiple</h3>
+          <table id="multi-table-body">
+            <thead>
+              <tr>
+                <th>Moneda</th>
+                <th>Valor</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </section>
+
+        <div class="result" aria-live="polite" aria-atomic="true">
+          <div class="result-amount">
+            <h3 id="result-title">Resultado</h3>
+            <p class="big">
+              <span id="result-value">-</span>
+              <span id="result-code" class="muted"></span>
+            </p>
+            <div id="resultado"></div>
+            <div id="mensaje-error"></div>
+          </div>
+
+          <div class="result-details">
+            <div class="row">
+              <span>Tasa actual</span>
+              <strong id="rate-output">-</strong>
+            </div>
+            <div class="row">
+              <span>Tasa Inversa</span>
+              <strong id="inverse-rate">-</strong>
+              <div class="row">
+                <span>Margen Aplicado</span>
+                <strong id="applied-fee">0%</strong>
+              </div>
+              <div class="row">
+                <span>Actualizado</span>
+                <strong id="updated-at">-</strong>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="card" id="quick">
+        <h2>Pares Rápidos</h2>
+        <div id="quick-pairs" class="chip-row" role="list"></div>
+      </section>
+
+      <section class="card" id="history">
+        <h2>Historial de conversiones</h2>
+        <div class="table-wrap">
+          <table id="history-table">
+            <thead>
+              <tr>
+                <th>Fecha</th>
+                <th>Par</th>
+                <th>Monto</th>
+                <th>Tasa</th>
+                <th>Resultado</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="history-body"></tbody>
+          </table>
+        </div>
+        <div class="table-actions">
+          <button id="btn-clear-history" class="btn btn-ghost">
+            Borrar Historial
+          </button>
+        </div>
+      </section>
+
+      <aside
+        id="favorites-panel"
+        class="panel hidden"
+        aria-hidden="true"
+        aria-labelledby="favorites-title"
+      >
+        <div class="panel-header">
+          <h2 id="favorites-title">Favoritos</h2>
+          <button
+            id="btn-close-favorites"
+            class="btn btn-ghost"
+            aria-label="Cerrar Favoritos"
+          >
+            ✕
+          </button>
+        </div>
+        <div id="favorites-list" class="favorites-list" role="list"></div>
+      </aside>
+    </main>
+
+    <div
+      id="settings-modal"
+      class="modal hidden"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="settings-title"
+    >
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 id="settings-title">Configuración</h3>
+          <button
+            id="btn-close-settings"
+            class="btn btn-ghost"
+            aria-label="Cerrar Configuración"
+          >
+            ✕
+          </button>
+        </div>
+
+        <form id="settings-form" class="settings-form">
+          <fieldset>
+            <legend>Preferencias</legend>
+
+            <label>
+              <span>Moneda por defecto</span>
+              <select id="default-base"></select>
+            </label>
+
+            <label>
+              <span>Monedas favoritas</span>
+              <select id="default-favs" multiple></select>
+            </label>
+
+            <label class="inline">
+              <input id="prefer-black-market" type="checkbox" />
+              <span>Preferir tasa alternativa si está disponible</span>
+            </label>
+
+            <label>
+              <span>Formato numérico</span>
+              <select id="locale-format">
+                <option value="es-AR">es-AR</option>
+                <option value="en-US">en-US</option>
+                <option value="pt-BR">pt-BR</option>
+              </select>
+            </label>
+          </fieldset>
+
+          <div class="modal-actions">
+            <button
+              id="btn-save-settings"
+              type="submit"
+              class="btn btn-primary"
+            >
+              Guardar
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div id="backdrop" class="backdrop hidden"></div>
+    <div id="loader" class="loader hidden" role="status" aria-live="polite">
+      Cargando…
+    </div>
+
+    <template id="tpl-history-row">
+      <tr></tr>
+      <tr>
+        <td class="cell-date"></td>
+        <td class="cell-pair"></td>
+        <td class="cell-amount"></td>
+        <td class="cell-rate"></td>
+        <td class="cell-result"></td>
+        <td class="cell-actions">
+          <button class="btn btn-ghost btn-reuse" title="Reusar">↺</button>
+          <button class="btn btn-ghost btn-delete" title="Eliminar">🗑️</button>
+        </td>
+      </tr>
+    </template>
+
+    <template id="tpl-favorite-item">
+      <div class="favorite" role="listitem" data-base="" data-target="">
+        <span class="pair"></span>
+        <div class="fav-actions">
+          <button class="btn btn-secondary btn-use">Usar</button>
+          <button class="btn btn-ghost btn-remove" title="Quitar">✕</button>
+        </div>
+      </div>
+    </template>
+
+    <footer class="footer">
+      <p>
+        Simulador de Conversión de Divisas, Hecho para CoderHouse por Agustín
+        Vozza.
+      </p>
+    </footer>
+
+    <script src="./app.js" type="module" defer></script>
+  </body>
+</html>
