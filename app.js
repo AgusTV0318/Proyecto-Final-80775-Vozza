@@ -116,6 +116,30 @@ async function fetchLatestFromAPI(base = API_BASE_CURRENCY) {
   }
 }
 
+async function fetchLatest() {
+  const API_BASE =
+    "https://api.exchangerate.host/latest?base=ARS&symbols=USD,EUR,BRL";
+
+  try {
+    const res = await fetch(API_BASE);
+
+    if (!res.ok) {
+      throw new Error(`Error HTTP: ${Response.status}`);
+    }
+
+    const data = await res.json();
+
+    if (!data.rates) {
+      throw new Error("Respuesta de API inválida o incompleta.");
+    }
+
+    return data;
+  } catch (error) {
+    console.error("Error al obtener datos de la API:", error);
+    throw error;
+  }
+}
+
 async function fetchTimeseriesFromAPI(base, target, days) {
   try {
     const end = new Date();
@@ -390,9 +414,7 @@ async function loadRates() {
   limpiarError();
 
   try {
-    const { rates: map, updatedAt: date } = await fetchLatestFromAPI(
-      API_BASE_CURRENCY
-    );
+    const { rates: map, updatedAt: date } = await fetchLatestFromAPI(API_BASE);
     rates = map;
     if (updatedAt) {
       updatedAt.textContent = new Date(date).toLocaleString();
