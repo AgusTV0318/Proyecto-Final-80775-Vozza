@@ -90,7 +90,7 @@ async function fetchLatestFromAPI(base = API_BASE_CURRENCY) {
     const res = await fetch(url);
 
     if (!res.ok) {
-      throw new Error(`Error HTTP: ${res.status}`);
+      throw new Error(`Error HTTPS: ${res.status}`);
     }
 
     const data = await res.json();
@@ -155,7 +155,9 @@ async function fetchTimeseriesFromAPI(base, target, days) {
 
 async function fetchLatestFromLocal() {
   try {
-    const res = await fetch(LOCAL_DATA_URL);
+    const res = await fetch(
+      "https://api.exchangerate.host/latest?base=ARS&symbols=USD"
+    );
     if (!res.ok) throw new Error("No se pudo cargar JSON local");
     const data = await res.json();
     const map = { ...data.rates };
