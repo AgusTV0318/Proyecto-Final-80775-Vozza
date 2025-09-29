@@ -1,0 +1,96 @@
+{
+  "base": "USD",
+  "lastUpdate": "2025-09-29",
+  "currencies": {
+    "USD": {
+      "name": "Dólar Estadounidense",
+      "symbol": "$",
+      "rate": 1
+    },
+    "EUR": {
+      "name": "Euro",
+      "symbol": "€",
+      "rate": 0.92
+    },
+    "GBP": {
+      "name": "Libra Esterlina",
+      "symbol": "£",
+      "rate": 0.79
+    },
+    "JPY": {
+      "name": "Yen Japonés",
+      "symbol": "¥",
+      "rate": 149.5
+    },
+    "ARS": {
+      "name": "Peso Argentino",
+      "symbol": "$",
+      "rate": 850.0
+    },
+    "BRL": {
+      "name": "Real Brasileño",
+      "symbol": "R$",
+      "rate": 5.15
+    },
+    "CAD": {
+      "name": "Dólar Canadiense",
+      "symbol": "C$",
+      "rate": 1.35
+    },
+    "CHF": {
+      "name": "Franco Suizo",
+      "symbol": "Fr",
+      "rate": 0.86
+    },
+    "CNY": {
+      "name": "Yuan Chino",
+      "symbol": "¥",
+      "rate": 7.25
+    },
+    "MXN": {
+      "name": "Peso Mexicano",
+      "symbol": "$",
+      "rate": 17.2
+    },
+    "AUD": {
+      "name": "Dólar Australiano",
+      "symbol": "A$",
+      "rate": 1.52
+    },
+    "INR": {
+      "name": "Rupia India",
+      "symbol": "₹",
+      "rate": 83.15
+    },
+    "RUB": {
+      "name": "Rublo Ruso",
+      "symbol": "₽",
+      "rate": 92.5
+    },
+    "KRW": {
+      "name": "Won Surcoreano",
+      "symbol": "₩",
+      "rate": 1340.0
+    },
+    "CLP": {
+      "name": "Peso Chileno",
+      "symbol": "$",
+      "rate": 920.0
+    },
+    "COP": {
+      "name": "Peso Colombiano",
+      "symbol": "$",
+      "rate": 4150.0
+    },
+    "PEN": {
+      "name": "Sol Peruano",
+      "symbol": "S/",
+      "rate": 3.75
+    },
+    "UYU": {
+      "name": "Peso Uruguayo",
+      "symbol": "$U",
+      "rate": 42.5
+    }
+  }
+}
